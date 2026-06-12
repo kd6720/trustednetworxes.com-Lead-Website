@@ -1,4 +1,4 @@
-// TrustedNetworx CRM — Prisma schema (SQLite)
+// TrustedNetworx CRM — Prisma schema (PostgreSQL / Supabase)
 // Docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {

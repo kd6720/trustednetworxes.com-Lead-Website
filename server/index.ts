@@ -48,6 +48,12 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: err.message || "Internal server error" });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 TrustedNetworx CRM API listening on http://localhost:${PORT}`);
-});
+// Only start listening when run directly (not imported as a serverless function).
+const isMain = process.argv[1]?.includes("server/index");
+if (isMain) {
+  app.listen(PORT, () => {
+    console.log(`🚀 TrustedNetworx CRM API listening on http://localhost:${PORT}`);
+  });
+}
+
+export { app };

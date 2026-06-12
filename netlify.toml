@@ -1,0 +1,36 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  # Bundle the function with esbuild to handle TypeScript + node_modules
+  node_bundler = "esbuild"
+
+[functions."api"]
+  # The function handles all /api/* requests
+  included_files = [
+    "server/**",
+    "src/generated/prisma/**",
+    "node_modules/.prisma/client/**",
+    "prisma.config.ts",
+    "!node_modules/@prisma/adapter-pg/node_modules/**"
+  ]
+
+[[redirects]]
+  # Proxy all /api/* requests to the serverless function
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  # Proxy public forms endpoint too
+  from = "/api/public/forms/*"
+  to = "/.netlify/functions/api"
+  status = 200
+
+[[redirects]]
+  # SPA fallback — all other routes serve index.html
+  from = "/*"
+  to = "/index.html"
+  status = 200

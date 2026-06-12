@@ -28,3 +28,6 @@ dist-ssr
 # Environment & database
 .env
 dev.db
+
+# Supabase CLI temp files
+supabase/.temp/

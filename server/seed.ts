@@ -1,6 +1,11 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { prisma } from "./db.js";
+import { PrismaClient } from "../src/generated/prisma/client.js";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+// Use DIRECT_URL for seeding (direct connection — no pooler needed)
+const adapter = new PrismaPg({ connectionString: process.env.DIRECT_URL! });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("🌱 Seeding TrustedNetworx CRM demo data...");
