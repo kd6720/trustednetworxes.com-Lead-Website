@@ -1,0 +1,138 @@
+// TrustedNetworx CRM — Prisma schema (SQLite)
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("user") // admin | manager | user
+  createdAt DateTime @default(now())
+
+  companies  Company[]
+  contacts   Contact[]
+  leads      Lead[]
+  activities Activity[]
+  apiKeys    ApiKey[]
+}
+
+model Company {
+  id             String   @id @default(uuid())
+  name           String
+  website        String?
+  industry       String?
+  size           String?
+  address        String?
+  city           String?
+  state          String?
+  zip            String?
+  notes          String?
+  leadSource     String?
+  assignedUserId String?
+  assignedUser   User?    @relation(fields: [assignedUserId], references: [id])
+  createdAt      DateTime @default(now())
+
+  contacts Contact[]
+  leads    Lead[]
+}
+
+model Contact {
+  id             String   @id @default(uuid())
+  firstName      String
+  lastName       String
+  title          String?
+  email          String?
+  phone          String?
+  mobile         String?
+  companyId      String?
+  company        Company? @relation(fields: [companyId], references: [id])
+  notes          String?
+  leadStatus     String   @default("New")
+  assignedUserId String?
+  assignedUser   User?    @relation(fields: [assignedUserId], references: [id])
+  createdAt      DateTime @default(now())
+
+  leads Lead[]
+}
+
+model Lead {
+  id             String    @id @default(uuid())
+  name           String
+  companyId      String?
+  company        Company?  @relation(fields: [companyId], references: [id])
+  contactId      String?
+  contact        Contact?  @relation(fields: [contactId], references: [id])
+  source         String?
+  status         String    @default("New") // New | Contacted | Qualified | Proposal Sent | Won | Lost
+  estimatedValue Float?
+  nextFollowUp   DateTime?
+  notes          String?
+  assignedUserId String?
+  assignedUser   User?     @relation(fields: [assignedUserId], references: [id])
+  createdAt      DateTime  @default(now())
+
+  activities Activity[]
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  type        String // note | call | email | meeting | status_change | created
+  description String
+  leadId      String?
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Form {
+  id                  String   @id @default(uuid())
+  name                String
+  fields              String // JSON-encoded field definitions
+  redirectUrl         String?
+  confirmationMessage String?
+  notifyEmail         String?
+  spamProtection      Boolean  @default(true)
+  createdAt           DateTime @default(now())
+
+  submissions FormSubmission[]
+}
+
+model FormSubmission {
+  id        String   @id @default(uuid())
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  data      String // JSON-encoded submitted values
+  source    String?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model ApiKey {
+  id        String    @id @default(uuid())
+  key       String    @unique
+  name      String
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+  scopes    String    @default("read,write")
+  lastUsed  DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Webhook {
+  id        String   @id @default(uuid())
+  url       String
+  event     String   @default("lead.created")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
