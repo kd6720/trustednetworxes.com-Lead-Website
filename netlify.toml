@@ -4,33 +4,26 @@
   functions = "netlify/functions"
 
 [functions]
-  # Bundle the function with esbuild to handle TypeScript + node_modules
   node_bundler = "esbuild"
+  # Prisma Client, the pg adapter, and native drivers cannot be bundled by esbuild.
+  # They're kept as external require() calls and included in the function zip via node_modules.
+  external_node_modules = ["@prisma/client", "@prisma/adapter-pg", "pg", "pg-native", "bufferutil", "utf-8-validate"]
 
 [functions."api"]
-  # The function handles all /api/* requests
   included_files = [
-    "server/**",
+    "server/**/*.ts",
+    "server/**/*.js",
     "src/generated/prisma/**",
-    "node_modules/.prisma/client/**",
     "prisma.config.ts",
-    "!node_modules/@prisma/adapter-pg/node_modules/**"
+    "prisma/schema.prisma",
   ]
 
 [[redirects]]
-  # Proxy all /api/* requests to the serverless function
   from = "/api/*"
   to = "/.netlify/functions/api"
   status = 200
 
 [[redirects]]
-  # Proxy public forms endpoint too
-  from = "/api/public/forms/*"
-  to = "/.netlify/functions/api"
-  status = 200
-
-[[redirects]]
-  # SPA fallback — all other routes serve index.html
   from = "/*"
   to = "/index.html"
   status = 200
