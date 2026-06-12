@@ -60,8 +60,8 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const body = req.body ?? {};
   if (!body.name) return res.status(400).json({ error: "name is required" });
-  const data = pick(body) as { name: string; fields?: string };
-  if (!data.fields) data.fields = "[]";
+  const raw = pick(body) as { name: string; fields?: string };
+  const data: { name: string; fields: string } = { ...raw, fields: raw.fields ?? "[]" };
   const form = await prisma.form.create({ data });
   res.status(201).json(serialize(form));
 });

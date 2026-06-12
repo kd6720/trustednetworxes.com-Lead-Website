@@ -4,18 +4,39 @@
   functions = "netlify/functions"
 
 [functions]
-  node_bundler = "esbuild"
-  # Prisma Client, the pg adapter, and native drivers cannot be bundled by esbuild.
-  # They're kept as external require() calls and included in the function zip via node_modules.
-  external_node_modules = ["@prisma/client", "@prisma/adapter-pg", "pg", "pg-native", "bufferutil", "utf-8-validate"]
+  # No bundling — server TypeScript is pre-compiled to dist-server/ during build.
+  # The function just imports the compiled JS.
+  node_bundler = "none"
 
 [functions."api"]
   included_files = [
-    "server/**/*.ts",
-    "server/**/*.js",
-    "src/generated/prisma/**",
-    "prisma.config.ts",
-    "prisma/schema.prisma",
+    "dist-server/**",
+    "node_modules/.prisma/client/**",
+    "node_modules/@prisma/client/**",
+    "node_modules/@prisma/adapter-pg/**",
+    "node_modules/pg/**",
+    "node_modules/pg-*/**",
+    "node_modules/serverless-http/**",
+    "node_modules/express/**",
+    "node_modules/bcryptjs/**",
+    "node_modules/cors/**",
+    "node_modules/jsonwebtoken/**",
+    "node_modules/dotenv/**",
+    "node_modules/uuid/**",
+    "node_modules/jwa/**",
+    "node_modules/jws/**",
+    "node_modules/buffer-equal-constant-time/**",
+    "node_modules/ecdsa-sig-formatter/**",
+    "node_modules/safe-buffer/**",
+    "node_modules/semver/**",
+    "node_modules/lodash.includes/**",
+    "node_modules/lodash.isboolean/**",
+    "node_modules/lodash.isinteger/**",
+    "node_modules/lodash.isnumber/**",
+    "node_modules/lodash.isplainobject/**",
+    "node_modules/lodash.isstring/**",
+    "node_modules/lodash.once/**",
+    "node_modules/ms/**"
   ]
 
 [[redirects]]
