@@ -4,20 +4,9 @@
   functions = "netlify/functions"
 
 [functions]
-  # esbuild bundles all JS into a single file, keeping only native modules external
-  node_bundler = "esbuild"
-  external_node_modules = ["pg", "pg-*", "bcryptjs", "@prisma/adapter-pg"]
-
-[functions."api"]
-  included_files = [
-    "dist-server/**",
-    "node_modules/.prisma/**",
-    "node_modules/@prisma/client/**",
-    "node_modules/@prisma/adapter-pg/**",
-    "node_modules/pg/**",
-    "node_modules/pg-*/**",
-    "node_modules/bcryptjs/**"
-  ]
+  # The build emits netlify/functions/api.mjs as a single self-contained ESM
+  # bundle (scripts/build-function.mjs), so no server-side bundling is needed.
+  node_bundler = "none"
 
 [[redirects]]
   from = "/api/*"
