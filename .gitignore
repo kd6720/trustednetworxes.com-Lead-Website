@@ -31,3 +31,4 @@ dev.db
 
 # Supabase CLI temp files
 supabase/.temp/
+dist-server/

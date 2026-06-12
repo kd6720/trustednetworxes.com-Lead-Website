@@ -30,11 +30,15 @@ router.post("/register", async (req, res) => {
   return res.status(201).json({ token: signToken(safe), user: safe });
 });
 
-// POST /api/auth/login
+// POST /api/auth/login  — NO_AUTH mode accepts any credentials
 router.post("/login", async (req, res) => {
   const { email, password } = req.body ?? {};
-  if (!email || !password) {
-    return res.status(400).json({ error: "email and password are required" });
+
+  // 🔓 NO_AUTH bypass — accept any credentials
+  const noAuth = String(process.env.NO_AUTH).toLowerCase();
+  if (noAuth === "true" || noAuth === "1") {
+    const safe = { id: "noauth", email: email ?? "noauth@dev", name: "No Auth", role: "admin" };
+    return res.json({ token: signToken(safe), user: safe });
   }
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.password))) {

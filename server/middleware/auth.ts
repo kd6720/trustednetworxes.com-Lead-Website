@@ -28,6 +28,12 @@ export function signToken(user: AuthUser): string {
 
 /** Require a valid JWT bearer token. Populates req.user. */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  // 🔓 NO_AUTH bypass — skip authentication entirely
+  const noAuth = String(process.env.NO_AUTH).toLowerCase();
+  if (noAuth === "true" || noAuth === "1") {
+    req.user = { id: "noauth", email: "noauth@dev", name: "No Auth", role: "admin" };
+    return next();
+  }
   const header = req.headers.authorization;
   if (!header || !header.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Missing or invalid Authorization header" });
