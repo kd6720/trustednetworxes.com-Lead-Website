@@ -24,6 +24,27 @@ app.set("trust proxy", true);
 // Health check
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "trustednetworx-crm" }));
 
+// Diagnostic endpoint — tests DB connectivity and env vars (no auth)
+app.get("/api/diag", async (_req, res) => {
+  const result: Record<string, unknown> = {
+    env: {
+      DATABASE_URL: process.env.DATABASE_URL ? "set" : "MISSING",
+      JWT_SECRET: process.env.JWT_SECRET ? "set" : "MISSING",
+      NO_AUTH: process.env.NO_AUTH ?? "MISSING",
+    },
+    db: "not tested",
+  };
+  try {
+    const { prisma } = await import("./db.js");
+    const count = await prisma.company.count();
+    result.db = { connected: true, companyCount: count };
+  } catch (e: unknown) {
+    const err = e as Error;
+    result.db = { connected: false, error: err.message, stack: err.stack?.split("\n").slice(0, 3) };
+  }
+  res.json(result);
+});
+
 // Authenticated app routes
 app.use("/api/auth", authRoutes);
 app.use("/api/companies", companiesRoutes);
