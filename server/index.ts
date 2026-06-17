@@ -18,6 +18,17 @@ const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
 
 app.use(cors());
+
+// Fix: serverless-http passes body as a raw Buffer; unwrap and parse it
+// so downstream route handlers see proper req.body JSON.
+app.use((req, _res, next) => {
+  if (req.body && Buffer.isBuffer(req.body)) {
+    const str = req.body.toString();
+    try { req.body = JSON.parse(str); } catch { req.body = str; }
+  }
+  next();
+});
+
 app.use(express.json({ limit: "1mb" }));
 app.set("trust proxy", true);
 
