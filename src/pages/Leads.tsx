@@ -5,7 +5,7 @@ import { Plus, Search, Loader2, GripVertical } from 'lucide-react';
 import { api, qs } from '../lib/api';
 import type { Lead, Company, Contact, CompanyRef } from '../types';
 import { LEAD_STATUSES } from '../types';
-import { formatCurrency, statusStyle } from '../lib/format';
+import { formatCurrency, statusStyle, timeAgo } from '../lib/format';
 import { Modal, Field, Spinner } from '../components/ui';
 import { useToast } from '../contexts/ToastContext';
 import LeadDetail from './LeadDetail';
@@ -179,6 +179,7 @@ export default function Leads() {
                           <GripVertical className="h-4 w-4 shrink-0 text-slate-300 opacity-0 group-hover:opacity-100" />
                         </div>
                         {company && <p className="mt-1 text-xs text-slate-500">{company.name}</p>}
+                        <p className="mt-1 text-xs text-slate-400">{timeAgo(l.createdAt)}</p>
                         {l.estimatedValue != null && (
                           <p className="mt-2 text-sm font-semibold text-slate-700">
                             {formatCurrency(l.estimatedValue)}
